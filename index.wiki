@@ -1,0 +1,11 @@
+= Certification Prep =
+
+== AWS ==
+	* [[SysOps Administrator Associate]]
+	* Developer Associate
+== Azure ==
+
+== GCP ==
+
+== DevOps Boulder Group ==
+	* [[January]] - Dan Moore - Integrating AWS Tooling and DevOps Pipelines with Slack

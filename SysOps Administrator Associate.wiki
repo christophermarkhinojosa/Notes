@@ -1,0 +1,283 @@
+= SysOps Administrator Notes =
+
+== Shared Responsibility Model ==
+	* *AWS* - Security OF the cloud
+		* Virtualization hardware
+		* Personnel security
+		* Network devices
+		* DDoS/Spoofing detection and prevention
+	* *Client* - Security IN the cloud
+		* IAM users and groups
+		* Data in transit and data at rest
+	* *Penetration testing*: https://aws.amazon.com/security/penetration-testing/  
+
+== Security on AWS ==
+=== IAM: Users and Groups ===
+	* *Administrator Access Policy* - Grants almost all permissions of the root account EXCEPT for billing permissions
+
+=== IAM: Policies ===
+	* *Administrator access* - Full access to all AWS resources
+	* *Power user access* - Admin access except it does not allow user/group management
+	* *Read-only access* - Only view AWS resources
+	
+=== IAM: Roles ===
+	* Temporary security credentials in AWS that grant another entity the specific permissions defined by the role
+	* Allows for temporary access to AWS accounts and resources for users outside of account
+
+=== S3: Data Integrity ===
+	* *Versioning* allows for more durability, allowing for users to revert back to a previous version of a file
+	* *Replication*: Items in an S3 bucket are automatically replicated to multiple availability zones
+	* *MFA Delete*: Requires versioning enabled on the bucket
+
+=== Amazon VPC: Security Groups and NACLs ===
+	* *Security Groups*: Group instances with similar functions
+		* *Stateful* = every allowed TCP or UDP port will be allowed in both directions
+	* *NACLs (Network Access Control Lists)*: _Union of all ports allowed in constituent security groups_
+		* *Stateless* = inbound and outbound rules are separate, have no dependencies
+		* *Ephemeral ports*: Client requests depending on OS (ports 1024-65535)
+			* The client that initiates the request chooses the ephemeral port range
+
+=== AWS STS: Federation ===
+	* Grants temporary access to IAM users and Federated users
+	* Allows for granular control for length of access (default is 1 hour)
+	* Credentials are not stored with the user or service granted temporary access
+	* Users aren’t granted access, but the tokens are
+	* https://jwt.io/ can be used to decrypt tokens
+
+=== Amazon Inspector ===
+	* Requires the *Inspector Agent* to be installed on instances
+	* Inspects only *EC2* instances
+		* Analyzes their behavior
+		* Tests network accessibility and security state
+	* Create *Assessment Templates* and run those assessments on targets
+
+=== AWS KMS Essentials ===
+	* *If keys are lost or deleted the data protected by the key is unrecoverable*
+	* *CloudHSM (Hardware Security Module)*
+		*FIPS 140-2 *Level 3* compliance
+
+=== AWS Certificate Manager ===
+	* Used to create and manage SSL certificates for web applications
+	* Native integration with ELB, CloudFront, Elastic Beanstalk, and API Gateway
+	* NO cost associated with certifications
+	* Certificates automatically renew when actively used with supported services
+	* Integrates with Route 53 to perform DNS checks as part of the certificate-issuing process
+	* ACM is regional - certificates can be applied to services in that region only
+
+=== AWS Web Application Firewall (WAF) ===
+	* Protect web applications from common exploits that could affect availability, compromise security, or consume excessive resources
+	* WAF monitors HTTP requests directed at Amazon CloudFront, API Gateway, or an Application Load Balancer
+	* This is done through the use of *Web Access Control Lists (Web ACL)*
+	* Rules run in regions
+
+=== AWS Trusted Advisor ===
+	* Used to help reduce costs, increase performance, and improve the security of AWS environments
+	* Provides real-time guidance to help provision resources following AWS best practices
+
+== Compute ==
+=== Amazon EC2 Status Checks ===
+	* *System Status Checks*
+		* _Within AWS control_
+		* Monitor the systems on which instances run
+		* Software issues on physical host
+		* Loss of network connectivity or system power
+	* *Instance Status Check*s
+		* _Within customer control_
+		* Monitor the network and software configuration on an instance
+		* Exhausted memory
+		* Corrupt file system
+
+=== EC2 Instance Types and Performance ===
+	* *Hardware Virtual Machine (HVM) AMIs*
+		* Executes the master boot record of the root storage device
+		* Virtual hardware set allows for running an OS as if it were run on bare metal; the OS doesn’t know its virtualized
+	* *Paravirtual (PV) AMIs*
+		* Runs a special boot loader and then loads the kernel
+		* Can run on hardware that does not support virtualization 
+	* *EC2 Instance Types*
+		* *General Purpose*
+			* *A1, T2, T3, M4, M5*
+		* *Compute Optimized*
+			* *C4, C5*
+		* *Memory Optimized*
+			* *R4, R5, X1, X1e, High Memory, z1d*
+		* *Accelerated Computing*
+			* *P2, P3*: General-purpose GPU compute
+			* *G3*: Graphics-intensive workloads
+			* *F1*: Customizable hardware acceleration
+		* *Storage Optimized*
+			* *H1*: Up to 16 Tb of local HDD storage
+			* *D2*: Up to 64 Tb of local HDD storage
+			* *I3*: NVMe SSD-backed (high IOPs at low cost)
+
+=== EC2: NAT Gateways and Bastion Hosts ===
+	* NAT Gateways are needed to contact the internet from private subnets
+	* SSH to Bastion host -> SSH into private instance
+
+=== EC2: Reserved Instances ===
+	* *Reserved instance marketplace*: Sell remainder of term at a discount
+	* Two terms: *12* and *36* months
+
+=== EC2: Initializing Volumes ===
+	* New EBS volumes operate at maximum performance as they are available
+	* EBS volumes created from snapshots must be initialized (all blocks on the device have been read)
+
+=== EC2: Troubleshooting Auto Scaling Issues ===
+	* Common Issues:
+		* Using the wrong subnet
+		* Availability zone is no longer available or supported
+		* Security group does not exist
+		* AMI issues
+
+=== Amazon Lightsail and AWS Batch ===
+	* *Lightsail*: Virtual Private Server service inside of AWS
+	* *AWS Batch*: fully managed AWS service for handling batch computing jobs
+
+=== EC2 Placement Groups ===
+	* Used to control the EC2 Instance placement strategy
+	* Types of placement group strategies:
+		* _Cluster_ - clusters instances into a low-latency group in *a single Availability Zone*
+			* High performance but high risk
+		* _Spread_ - spreads instances across underlying hardware (max 7 instances per group in AZ)
+			*Used for critical applications
+		* _Partition_ - spreads instances across many different partitions (which rely on different sets of racks) within an AZ
+			* Up to 7 partitions per AZ
+			* Scales to 100s of EC2 instances per group
+
+=== EC2 Shutdown Behavior and Termination Protection ===
+	* *Shutdown behavior*: How should the instance react when shutdown is down using the OS?
+	* *Enable termination protection*: Protects against accidental termination in AWS Console or CLI
+		* Instances are not able to be terminated within the AWS Console
+
+=== EC2 Launch Troubleshooting ===
+	* #InstanceLimitExceeded error
+		* You have reached your limit of max number of instances / vCPUs per region
+		* Current limit is 20 instances / 32 vCPU
+	* #InsufficientInstanceCapacity 
+		* AWS does not have enough On-Demand capacity in the particular AZ to which the instance is launched
+	* #Instance Terminates Immediately 
+		* You’ve reached your EBC volume limit 
+		* An EBS snapshot is corrupt 
+		* The root EBS volume is encrypted and you do not have permissions to access the KMS key for decryption 
+		* The instance store-backed AMI that you used to launch the instance is missing a required part (an image.part.xx file)
+
+=== EC2 Cross Account AMI Copy ===
+	* You can’t copy an AMI with an associate billingProduct code that was shared with you from another account
+		* This includes *Windows AMIs* and *AMIs from the AWS Marketplace*
+	* You must launch an EC2 instance from the AMI, then create an AMI from the instance
+
+=== CloudWatch Metrics for EC2 ===
+	* Includes:
+		* *CPU*
+		* *Network*
+		* *Disk*
+		* *Status Check Metrics*
+
+= Managing EC2 at Scale - Systems Manager (SSM) & Opswork =
+== Systems Manager Overview ==
+	* Helps manage *EC2 and On-Premise* systemss at scale
+	* Patching automation for enhanced compliance
+	* Free service
+	* How Systems Manager works
+		* First the SSM agent should be installed on the systems that are being controlled
+		* Instances need an IAM role that is able to talk to SSM
+			* AmazonEC2RoleForSSM
+
+== AWS Tags & SSM Resource Groups ==
+	* Instances can be controlled from SSM depending on their Tag
+	* Create query-based group using Tags and grouping criteria
+		* Groups are *regional*
+
+== SSM Documents & SSM Run Command ==
+	* Documents 
+		* Can be in JSON or YAML
+	* Run Command
+		* Execute a document/script or just run a command
+		* Run command across multiple instances (using resource groups)
+		* Don't need to be SSH'd into instances
+		* Can specify a timeout in order to abort commands that are not completing successfully
+
+== SSM Inventory & Patches ==
+	* Inventory
+		* Multiple ways to patch instances:
+			* Inventory => List software on an instance
+			* Inventory + Run Command => Patch Software
+			* Patch manager + Maintenance Window => Patch OS
+			* Patch manager => Gives you compliance
+			* State manager => Ensure instances are in a consistent state (compliance)
+		* Can view ALL software on machines
+	* Patch Manager
+		* Sort instances by tags or patch group
+		* Patching Schedule: Choose existing maintenance window or create a new maintenance window
+
+== AWS Systems Manager: Session Manager ==
+	* Allows users to log into EC2 sessions remotely ONLY using the SSM agent.
+	* There is NO utilization of SSH in this. The EC2 instances DO NO need to have port 22 open.
+
+== What if I lost my SSH key for EC2? ==
+	* (Traditional Method) If the instance is EBS backed:
+		* Stop the instance, detach the root volume
+		* Attach the root volume to another instance as a data valume
+		* Modicy the ~/.ssh/authorized_keys file with your new key
+		* Move the volume back to the stopped instance
+		* Start the instance and you can SSH into it again
+	* (New Method) If the instance is EBS backed
+		* Run the AWSSupport-ResetAccess automation document in SSM
+	* Instance Store backed EC2:
+		* You cant stop the instance - AWS recommends termination
+		* (Possible alternative) Use Session Manager to access and edit the ~/.ssh/authorized_keys file directly
+
+== AWS Parameter Store ==
+	* Securely store and access configuration and secrets
+	* Serverless, scalable, durable, easy SDK and free
+	* Follows a heirarchy of access
+
+= Data Storage =
+== S3: Cross-Region Replication ==
+	* Bucket-level configuration
+	* Objects are *only replicated once*
+	* Retained by default
+		* Storage class
+		* Object names
+		* Owners
+		* Permissions
+	* Not replicated
+		* Objects that existed before replication was activated
+
+== EBS Performance ==
+	* Each SSD/HDD volume offered is able to burst to faster IOPS due to accumulating burst credits during normal use
+	* General Purpose SSD/Provisioned IOPS SSD/ and Magnetic HDD are able to be boot devices
+	* More information: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+
+== EBS Metrics ==
+	* CloudWatch captures and displays metric data every 5 minutes
+	* *If a volume is idle for a long time consider taking a snapshot of it and deleting the volume*
+		* This is much more cost-effective than letting the EBS volume be idle
+
+== EBS: Resizing or Changing Root Volumes ==
+	* Two ways of resizing root volumes, *Manual* and *Automatic*
+	* *Manual* - resizing the volume in the management console, logging into the instance and using commands to resize the partitions
+	* *Automatic* - changing the launch configuration of the auto scaling group to reflect a larger size. Terminating instances will allow the ASG to provision instances with the larger volumes
+
+== EBS: Ensuring Data Durability ==
+	* Taking snapshot before deleting volumes
+	* Attaching an EBS volume to an instance-store backed EC2 instance and saving any important data to the EBS volume
+	* By default, *instance store* and *EBS root* volumes are _not_ backed up
+
+== EFS: Deployment and Provisioning ==
+	* Can span multiple AZs
+	* Shared data store that can be mounted to multiple EC2 instances and on-prem servers
+	* Linux only
+	* Also allows burstable IO speeds
+	* Allows for lifecycle management
+	* Filesystem is mounted through *DNS Name*
+
+== EFS: Monitoring for Performance and Availability ==
+	* Included in CloudWatch Metrics:
+		* Burst Credit Balance
+		* Client Connections (1 per EC2 instance)
+		* Metadata of each object
+	* 1 minute intervals
+	* Retained for 15 months
+
+==  ==

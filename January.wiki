@@ -1,0 +1,47 @@
+= DevOps Boulder User's Group =
+= - January: Dan Moore - Integrating AWS tooling and DevOps pipelines with Slack - =
+
+== Open Job Positions ==
+	* Text Us: Downtown Boulder
+		* DevOps and Ruby Experience
+	* DevOps for a start up in Canada
+		* Python stack, GCP
+		* Business process automation
+	* DNS Filter
+		* Cloud-based web filtering
+	* Secure Set
+		* Lead instructor
+	* Splunk
+		* Open position for cloud team
+
+== Open Announcements ==
+	* BSides Boulder: https://bsidesboulder.org/home/
+
+== Research Further ==
+	* Mulesoft
+	* Zapier
+	* Run Book
+
+== Integrating AWS tooling and DevOps pipelines with Stack ==
+	- Dan Moore - Community Engineer - Transposit
+
+	* Using Slack to automate processes that don't necessarily need human intervention
+		* Ex: scrubbing PII or automating the creation of tickets/notifications for IT dept
+	* _CSE Pipeline_
+
+=== Benefits of Slack ===
+	* Searchable - Easy to search through messages/alerts
+	* Linkable
+	* Timestamps
+	* Mobile - Available on mobile devices
+	* Integrations - workflows/Teams/Custom integrations
+
+=== DevOps + Slack ===
+	* Create a channel used for DevOps (incident channel, etc.)
+	* Firehose events to a channel(s) in Slack
+
+=== Slack Apps ===
+	* Composed of JSON
+	* Can be created as Wizards, Modals
+	* "Slack UI Guidelines pdf"
+
