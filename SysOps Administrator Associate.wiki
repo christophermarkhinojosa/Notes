@@ -460,3 +460,55 @@
 === Cost Optimization ===
 
 
+== Elastic Beanstalk for SysOps ==
+=== Beanstalk Overview ===
+	* Three Architecture models:
+		* Single Instance Deployment: good for dev
+		* LB + ASG: great for production or pre-production web applications
+		* ASG only: great for non-web apps in production (workers,etc..)
+	* ElasticBeanStalk has three components 
+		* Application
+		* Application version: each deployment gets assigned a version
+		* Environment name (dev,test,prod..)
+
+=== Beanstalk Deployment Modes ===
+	* *All at once (deploy all in one go)* - fastest, but instances aren't available to serve traffic for a bit (downtime)
+		* No additional cost
+	* *Rolling:* update a few instances at a time (bucket), and then move onto the next bucket once the first bucket is healthy
+		* Application runs below capacity, may be a problem
+		* Application is running both versions simultaneously
+		* May be a long deployment
+	* *Rolling with additional batches:* like rolling, but spins up new instances to move the batch (so that the old application is still available)
+		* Application runs at capacity
+		* Creates an additional cost
+		* Deployment will be longer
+		* Good for prod
+	* *Immutable:* spins up new instances in a new ASG, deploys version to these instances, and then swaps all the instances when everything is healthy
+		* Zero downtime
+		* New Code is deployed to new instances
+		* High cost due to doubling capacity
+		* Longest deployment
+		* Great for prod
+	* *Blue/Green Deployment*
+		* Not a "direct feature" of Elastic Beanstalk
+		* Zero downtime and release facility
+		* Create a new "stage" environment and deploy v2 therefore
+		* Very manual to do
+	* https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
+
+=== Beanstalk for SysOps ===
+	* Beanstalk can put application logs into CloudWatch Logs
+	* Custom domain: Route53 ALIAS or CNAME on top of Beanstalk URL
+	* When EC2 instances are created it will resolve the app dependences (can take a while)
+		* Can use a Golden AMI to help with this
+		* Standardized company-specific AMI
+			* Package OS, App, and company software dependencies
+	* Troubleshooting Beanstalk
+		* Review environment events
+		* Pull logs to view recent log file entries
+		* Roll back to a previous, working version of the application
+		* When accessing external resources, make sure the security groups are correctly configured
+
+== CloudFormation for SysOps ==
+
+== EC2 Storage and Data Management - EBS and EFS ==
