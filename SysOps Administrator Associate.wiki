@@ -377,7 +377,7 @@
 		* Bandwidth limitations using VPNs
 			* Direct Connect is preferred if bandwidth is a concern
 
-= Databases =
+== Databases ==
 === Amazon RDS: Understanding Multi-AZ Deployments ===
 	* Fault-tolerant feature in RDS
 	* Creates a stand-by replica in a separate AZ
@@ -402,7 +402,7 @@
 	* MySQL and PosgreSQL compatible with substantially higher throughput
 	* *Multi-AZ Cluster Volume storage model*
 
-= Provisioning, Deployment, and Management = 
+== Provisioning, Deployment, and Management == 
 === AWS Elastic Beanstalk ===
 	* Uses 2 AZ and a Load Balancer
 	* Creating highly-available applications by default
@@ -411,7 +411,7 @@
 	* 
 
 === AWS Systems Manager ===
-
+	* 
 
 === AWS OpsWorks ===
 	* Managed Chef & Puppet
@@ -421,14 +421,14 @@
 === Disaster Recovery ===
 
 
-= Application Integration and Automation =
+== Application Integration and Automation ==
 === Amazon SQS and Amazon SNS: Scalability ===
 
 
 === AWS Lambda ===
 
 
-= Monitor and Metrics =
+== Monitor and Metrics ==
 === Amazon CloudWatch Essentials ===
 
 
@@ -444,7 +444,7 @@
 === AWS CloudTrail ===
 
 
-= Management, Governance, and Cost Controls =
+== Management, Governance, and Cost Controls ==
 === AWS Config ===
 
 
