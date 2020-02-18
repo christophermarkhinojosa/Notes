@@ -173,8 +173,8 @@
 		* *Disk*
 		* *Status Check Metrics*
 
-= Managing EC2 at Scale - Systems Manager (SSM) & Opswork =
-== Systems Manager Overview ==
+== Managing EC2 at Scale - Systems Manager (SSM) & Opswork ==
+=== Systems Manager Overview ===
 	* Helps manage *EC2 and On-Premise* systemss at scale
 	* Patching automation for enhanced compliance
 	* Free service
@@ -183,12 +183,12 @@
 		* Instances need an IAM role that is able to talk to SSM
 			* AmazonEC2RoleForSSM
 
-== AWS Tags & SSM Resource Groups ==
+=== AWS Tags & SSM Resource Groups ===
 	* Instances can be controlled from SSM depending on their Tag
 	* Create query-based group using Tags and grouping criteria
 		* Groups are *regional*
 
-== SSM Documents & SSM Run Command ==
+=== SSM Documents & SSM Run Command ===
 	* Documents 
 		* Can be in JSON or YAML
 	* Run Command
@@ -197,7 +197,7 @@
 		* Don't need to be SSH'd into instances
 		* Can specify a timeout in order to abort commands that are not completing successfully
 
-== SSM Inventory & Patches ==
+=== SSM Inventory & Patches ===
 	* Inventory
 		* Multiple ways to patch instances:
 			* Inventory => List software on an instance
@@ -210,11 +210,11 @@
 		* Sort instances by tags or patch group
 		* Patching Schedule: Choose existing maintenance window or create a new maintenance window
 
-== AWS Systems Manager: Session Manager ==
+=== AWS Systems Manager: Session Manager ===
 	* Allows users to log into EC2 sessions remotely ONLY using the SSM agent.
 	* There is NO utilization of SSH in this. The EC2 instances DO NO need to have port 22 open.
 
-== What if I lost my SSH key for EC2? ==
+=== What if I lost my SSH key for EC2? ===
 	* (Traditional Method) If the instance is EBS backed:
 		* Stop the instance, detach the root volume
 		* Attach the root volume to another instance as a data valume
@@ -227,13 +227,13 @@
 		* You cant stop the instance - AWS recommends termination
 		* (Possible alternative) Use Session Manager to access and edit the ~/.ssh/authorized_keys file directly
 
-== AWS Parameter Store ==
+=== AWS Parameter Store ===
 	* Securely store and access configuration and secrets
 	* Serverless, scalable, durable, easy SDK and free
 	* Follows a heirarchy of access
 
-= Data Storage =
-== S3: Cross-Region Replication ==
+== Data Storage ==
+=== S3: Cross-Region Replication ===
 	* Bucket-level configuration
 	* Objects are *only replicated once*
 	* Retained by default
@@ -244,27 +244,27 @@
 	* Not replicated
 		* Objects that existed before replication was activated
 
-== EBS Performance ==
+=== EBS Performance ===
 	* Each SSD/HDD volume offered is able to burst to faster IOPS due to accumulating burst credits during normal use
 	* General Purpose SSD/Provisioned IOPS SSD/ and Magnetic HDD are able to be boot devices
 	* More information: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
 
-== EBS Metrics ==
+=== EBS Metrics ===
 	* CloudWatch captures and displays metric data every 5 minutes
 	* *If a volume is idle for a long time consider taking a snapshot of it and deleting the volume*
 		* This is much more cost-effective than letting the EBS volume be idle
 
-== EBS: Resizing or Changing Root Volumes ==
+=== EBS: Resizing or Changing Root Volumes ===
 	* Two ways of resizing root volumes, *Manual* and *Automatic*
 	* *Manual* - resizing the volume in the management console, logging into the instance and using commands to resize the partitions
 	* *Automatic* - changing the launch configuration of the auto scaling group to reflect a larger size. Terminating instances will allow the ASG to provision instances with the larger volumes
 
-== EBS: Ensuring Data Durability ==
+=== EBS: Ensuring Data Durability ===
 	* Taking snapshot before deleting volumes
 	* Attaching an EBS volume to an instance-store backed EC2 instance and saving any important data to the EBS volume
 	* By default, *instance store* and *EBS root* volumes are _not_ backed up
 
-== EFS: Deployment and Provisioning ==
+=== EFS: Deployment and Provisioning ===
 	* Can span multiple AZs
 	* Shared data store that can be mounted to multiple EC2 instances and on-prem servers
 	* Linux only
@@ -272,7 +272,7 @@
 	* Allows for lifecycle management
 	* Filesystem is mounted through *DNS Name*
 
-== EFS: Monitoring for Performance and Availability ==
+=== EFS: Monitoring for Performance and Availability ===
 	* Included in CloudWatch Metrics:
 		* Burst Credit Balance
 		* Client Connections (1 per EC2 instance)
@@ -280,4 +280,183 @@
 	* 1 minute intervals
 	* Retained for 15 months
 
-==  ==
+=== RDS: Scaling for Performance ===
+	* Read replicas are useful to offload work from the main database
+	* *Read Replicas VS Multi-AZ Failover Deployments*
+		* Read Replicas: Primarily for performance
+			* Serve legitimate traffic
+			* Can be cross-regioned
+		* Multi-AZ: High availability and durability
+			* Only used to perform a failover
+	* _Backups are needed on the RDS instance before being able to create a read replica_
+	* Read Replicas can be promoted to a standalone instance if the Master db fails
+	* Multiple Read Replicas can be created an attached to increase performance
+
+== Networking ==
+=== VPC Essentials ===
+	* Private and public subnets
+	* Scalable infrastructure
+	* Ability to extend corporate/home network to the cloud as if it were part of your network
+	* Logically isolated from other networks on AWS
+	* Can range from /16 to /28 netmask (65,532 to 16 IP addresses)
+	* https://cidr.xyz 
+	* Subnets only span one AZ
+	* Route tables can be configured between subnets
+	* Public Subnets have a route to the public internet through an Internet Gateway
+	* *Research:* 3 Tier Architecture
+	* VPC IP Reservations (in a 10.0.0.0/24 example)
+		* *10.0.0.0:* Network Address
+		* *10.0.0.1:* Reserved by AWS for the Amazon VPC router
+		* *10.0.0.2:* Reserved by AWS. The IP address of the DNS server is always the base of the Amazon VPC network range, however, the base of each subnet range is also reserved
+		* *10.0.0.3:* Reserved by AWS for future use
+		* *10.0.0.255:* Network broadcast address. AWS does not support broadcast in an Amazon VPC, therefore they reserve this address
+		
+=== VPC Flow Logs ===
+	* *Data is stored in CloudWatch Logs*
+	* Capture network metadataa going in and out of network interfaces
+	* Can create multiple flow logs per instance
+	* Flow logs are not restricted to just EC2 instances
+		* Can be used for ELB, RES, Elasticache, Redshift, and Workspaces
+
+=== VPC Peering ===
+	* *Direct network routing* between different VPCs using *Private IP addresses*
+	* Instances communicate with each other as if they were on the same private network
+	* Allows for Inter-region peering
+	* All inter-region traffic is encrypted
+	* Traffic remains on the global AWS backbone
+
+=== AWS VPN ===
+	* Allows for secure communications from a private network to AWS
+	* *Components*
+		* Customer gateway (initiates the VPN connection)
+		* Virtual private gateway
+			* One per VPC
+		* VPN connection
+=== AWS Direct Connect ===
+	* Allows for a dedicated private connection to AWS with dedicated throughput
+	* Also provides virtual interfaces that can route to AWS services in different ways
+	* Provides *1 Gb* and *10 Gb* connections
+	* Requires *single-mode fiber*
+
+=== EC2: Elastic IP (EIP) and Elastic Network Interfaces (ENI) ===
+	* Elastic IPs (EIPs)
+		* A public IP address that can be "moved"
+		* Region-specific
+		* Two step process to implement: allocation and association
+		* Masks an EC2 failure by attaching the IP to a healthy instance
+	* Elastic Network Interfaces (ENIs)
+		* Virtual network card that includes:
+			* Primary and secondary private IPv4 addresses
+			* An EIP
+			* Public IPv4 and IPv6 addresses
+			* Security groups
+			* MAC address
+			* Description
+
+=== ELB: Monitoring for Performance and Availability ===
+	* Distributes incoming traffic to EC2 instances
+
+=== Amazon ELB: High Availability ===
+	* External and Internal load balancers
+		* External are public-facing
+		* Provide a public DNS host name
+	* Internal are used to distribute load to private servers
+	* Internal load balancers prevents external servers from seeing the internal servers, making it more secure
+	* *Sticky sessions*
+		* Load balancers will remember which server to send clients to through the use of cookies
+
+=== ELB: SSL Offloading ===
+	* Using SSL can affect application performance
+	* You can offload the SSL handshake and decryption to a load balancer to reduce this
+	* The SSL cert is applied only to the load balancer
+
+=== Network Bottlenecks ===
+	* Common Bottlenecks
+		* Spreading instances too geographically far apart
+		* Using smaller EC2 instances which have less bandwidth capability
+		* Bandwidth limitations using VPNs
+			* Direct Connect is preferred if bandwidth is a concern
+
+= Databases =
+=== Amazon RDS: Understanding Multi-AZ Deployments ===
+	* Fault-tolerant feature in RDS
+	* Creates a stand-by replica in a separate AZ
+	* Can cause higher write latency
+	* Downtime is between 30 and 40 seconds
+
+=== RDS: Monitoring for Performance and Availability ===
+	* Can use *CloudWatch Metrics*, *RDS Events*, and *Enhanced Monitoring* 
+
+=== Amazon ElastiCache: Monitoring for Performance and Availability ===
+	* ElastiCache nodes have instance families which determine the CPU, Memory, and Network Performance provisioned
+	* *Evictions*: When older items in the cache are removed to make space for new items
+		* Increase memory node size
+
+=== Amazon Dynamo DB Concepts ===
+	* 
+
+=== Amazon Redshift ===
+	* This video describes how Amazon uses Redshift to handle analyzing Amazon Payments: https://www.youtube.com/watch?v=lWK96BNx3Qk
+
+=== Amazon Aurora ===
+	* MySQL and PosgreSQL compatible with substantially higher throughput
+	* *Multi-AZ Cluster Volume storage model*
+
+= Provisioning, Deployment, and Management = 
+=== AWS Elastic Beanstalk ===
+	* Uses 2 AZ and a Load Balancer
+	* Creating highly-available applications by default
+
+=== Amazon Elastic Container Service (ECS) ===
+	* 
+
+=== AWS Systems Manager ===
+
+
+=== AWS OpsWorks ===
+	* Managed Chef & Puppet
+	* Alternative to AWS SSM
+	* In the exam: Chef & Puppet needed => OpsWorks
+
+=== Disaster Recovery ===
+
+
+= Application Integration and Automation =
+=== Amazon SQS and Amazon SNS: Scalability ===
+
+
+=== AWS Lambda ===
+
+
+= Monitor and Metrics =
+=== Amazon CloudWatch Essentials ===
+
+
+=== CloudWatch Alarms ===
+
+
+=== CloudWatch Logs ===
+
+
+=== CloudWatch Events ===
+
+
+=== AWS CloudTrail ===
+
+
+= Management, Governance, and Cost Controls =
+=== AWS Config ===
+
+
+=== Health Dashboards ===
+
+
+=== AWS Billing and Organizations ===
+
+
+=== AWS Cost Explorer ===
+
+
+=== Cost Optimization ===
+
+
