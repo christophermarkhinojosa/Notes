@@ -510,5 +510,34 @@
 		* When accessing external resources, make sure the security groups are correctly configured
 
 == CloudFormation for SysOps ==
+=== CloudFormation Overview ===
+	* Manual work is very tough to reproduce (in another region, AWS account, etc.)
+	* Benefits of CloudFormation
+		* No resources are manually created, excellent for control
+		* Code can be version controlled
+		* Changes to the infrastructure are reviewed through code
+		* Ability to destroy and recreate infrastructure as often as you want
+		* Automated generation of Diagrams for Templates
+		* Don't have to re-invent the wheel
+			* Leverage existing Templates
+	* How it works
+		* Templates are uploaded in S3 and then referenced in CloudFormation
+	* Template components:
+		* *Resources: AWS resources are declared in the template (MANDATORY)*
+		* Parameters: dynamic inputs for the template
+		* Mappings: the static variables for the template
+		* Outputs: References to what has been created
+		* Conditionals: List of conditions to perform resource creation
+		* Metadata
+
+=== YAML Crash Course ===
+	* Need to learn more about YAML. Practice by converting JSON documents into YAML
+
+=== CloudFormation Parameters ===
+	* Provide inputs to CF template
+	* Make it easier to reuse templates
+	* Don't have to re-upload a template to change its content
+	* Reference parameters by using *!Ref* function
+
 
 == EC2 Storage and Data Management - EBS and EFS ==
