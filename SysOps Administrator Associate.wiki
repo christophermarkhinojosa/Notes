@@ -541,3 +541,64 @@
 
 
 == EC2 Storage and Data Management - EBS and EFS ==
+
+= Jon Bonso Exams = 
+== Exam 1 ==
+
+== Exam 2 ==
+	- What is the procedure for viewing aggregation statistics in CloudWatch?
+		* There is no way to view aggregate statistics in CloudWatch. CloudWatch cannot aggregate data across Regions.
+			- It is possible to monitor AWS resources in multiple Regions using a signle ClouWatch dashboard, but it is not possible to aggregate the data across Regions.
+
+	- Which of the following ensures that the load balancer determines which cipher is used for SSL connection, and not the order of ciphers presented by the client?
+		* Server Order Preference
+			- Server Order Preference is used by ELB to negotiate connections between a client and a load balancer. During the SSL connection negotiation process, the client and the load balancer present a list of ciphers and protocols that they each support, in order of preference. _By default, the first cipher on the client's list that matches any one of the load balancer's ciphers is selected for the SSL connection._
+
+	- Which EC2 metrics would be used to figure out why customers are not loading a website that is running on 4 EBS-backed EC2 isntances attached to an ELB and configured with Auto Scaling. The website also has a database tier, which is using an RDS instance with 2 Read Replicas.
+		* Network In
+		* Network Packets Out
+		* CPU Utilization
+			- _CPU Utilization_ will help determine if the instances are being overloaded
+			- _Network In_ is correct because it will show the amount of bytes being received on all network interfaces by the instances
+			- _Network Packets Out_ is correct because it will show the amount of packets being sent on all network interfaces by the instances
+
+	- Spot Blocks are used to launch Spot Instances with a specified duration, and will run continously for the duration selected.
+
+	- Latency-based Route53 routing can be use to deliver region-specific content to users that are based in different regions.
+
+	- Use the AWS Service Catalog TagOption library when needing to easily manage tags on provisioned products with a consistent taxonomy
+		* Serves as a template for creating an AWS tag based on the TagOption
+
+	- Taking manual snapshots of a database but ensuring that there are no outages when a snapshot is created
+		* Re-design the RDS instance to use a Multi-AZ deployments configuration
+			- The snapshot will be taken on the stand-by 
+
+	- AWS X-Ray
+		* Used to trace and analyze user requests as they travel through Amazon API Gateway APIs
+
+	- ELB Access Logs
+		* Useful to find information such as a client's IP address, latencies, request paths, and server responses
+
+	- EBS-backed On-Demand EC2 instance terminates after going in the pending state
+		* The EBS snapshot from which the instance is being launched is corrupt
+		* The EBS volume limit has been reached
+		* The root EBS volume is encrypted and the user does not have permissions to access the KMS key for decryption
+
+	- Enable S3 access logging with policies and user roles that limit certain users for modifying S3 bucket contents
+		* Controls who can access the S3 bucket content by using policies and IAM roles
+
+	- Client has an archive of 70 TB of information. How would you transfer the data into AWS Glacier while ensuring the file names are correct?
+		* Use AWS Snowball to upload the archive files to Glacier by using the S3 lifecycle policy
+		* Upload the archive files in Amazon S3 Access. Set up a lifecycle policy to move the archives to Glacier
+
+	- Allocating a custom domain name to a private database server:
+		* Set up a private hosted zone in Route 53. Creat an A or AAAA record and specify the IP address of the database server
+
+	- Establishing a low latency, high-bandwidth connection between on-premise data centers to two VPCs in different regions
+		* Set up an AWS Direct Connect gateway with a virtual private gateway
+
+	- If you notice a significant increase in the number of HTTP 503-slow down responses received for AWS S3 PUT or DELETE object requests to a bucket that has versioning enabled, there might be one or more objects in the bucket which there are millions of versions. S3 will throttle requests to the bucket to protect the customer from an excessive amount of request traffic.
+
+== Exam 3 ==
+
+
